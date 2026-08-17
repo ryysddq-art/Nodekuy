@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nama Kamu — Content Creator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #eaf1ff;
+    --bg-2: #dbe7ff;
+    --surface: #ffffffcc;
+    --ink: #0b1730;
+    --ink-soft: #3c4a6b;
+    --blue-1: #2563eb;
+    --blue-2: #3b82f6;
+    --cyan: #22d3ee;
+    --ring: #93c5fd;
+    --shadow: 0 20px 60px -20px rgba(37,99,235,.35);
+    --transition: .5s cubic-bezier(.4,0,.2,1);
+  }
+  html.dark{
+    --bg: #050914;
+    --bg-2: #0a1226;
+    --surface: #0f1b3acc;
+    --ink: #eaf1ff;
+    --ink-soft: #9fb2dd;
+    --blue-1: #3b82f6;
+    --blue-2: #60a5fa;
+    --cyan: #22d3ee;
+    --ring: #1d3a7a;
+    --shadow: 0 20px 70px -15px rgba(59,130,246,.45);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{ filter: brightness(var(--u-bright,1)) contrast(var(--u-contrast,1)); }
+  body{
+    font-family:'Inter',sans-serif;
+    background: radial-gradient(circle at 20% 0%, var(--bg-2), var(--bg) 60%);
+    color:var(--ink);
+    min-height:100vh;
+    overflow-x:hidden;
+    transition: background var(--transition), color var(--transition);
+    padding-top:40px;
+  }
+  h1,h2,h3{font-family:'Sora',sans-serif;}
+
+  /* marquee running text */
+  .marquee-bar{
+    position:fixed; top:0; left:0; right:0; height:40px; z-index:20;
+    background: linear-gradient(90deg, var(--blue-1), var(--cyan));
+    overflow:hidden; display:flex; align-items:center;
+  }
+  .marquee-bar a{
+    display:inline-block; white-space:nowrap; color:#fff; text-decoration:none;
+    font-weight:700; font-size:13px; letter-spacing:.03em;
+    animation: marquee 14s linear infinite;
+    padding-left:100%;
+  }
+  .marquee-bar a:hover{ text-decoration:underline; }
+  @keyframes marquee{
+    0%{ transform: translateX(0); }
+    100%{ transform: translateX(-100%); }
+  }
+
+  /* animated background waves */
+  .bg-wave{ position:fixed; inset:0; z-index:-2; overflow:hidden; }
+  .bg-wave span{
+    position:absolute; border-radius:50%;
+    background: radial-gradient(circle, var(--blue-2), transparent 70%);
+    opacity:.35; filter: blur(10px);
+    animation: float 14s ease-in-out infinite;
+  }
+  .bg-wave span:nth-child(1){width:340px;height:340px; top:-80px; left:-60px; animation-duration:16s;}
+  .bg-wave span:nth-child(2){width:260px;height:260px; top:40%; right:-80px; background:radial-gradient(circle, var(--cyan), transparent 70%); animation-duration:20s;}
+  .bg-wave span:nth-child(3){width:420px;height:420px; bottom:-160px; left:20%; animation-duration:24s;}
+  @keyframes float{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(30px,-40px) scale(1.08); }
+  }
+
+  /* top-right controls */
+  .top-controls{
+    position:fixed; top:56px; right:20px; z-index:15;
+    display:flex; gap:10px; align-items:flex-start;
+  }
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%;
+    background: var(--surface); backdrop-filter: blur(10px);
+    border:1px solid var(--ring); box-shadow: var(--shadow);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    color:var(--blue-1); position:relative;
+  }
+  .icon-btn svg{ width:18px; height:18px; }
+  .toggle{
+    display:flex; align-items:center; gap:8px;
+    background: var(--surface); backdrop-filter: blur(10px);
+    border:1px solid var(--ring); border-radius:999px;
+    padding:8px 14px; cursor:pointer;
+    box-shadow: var(--shadow);
+    font-size:13px; font-weight:600; color:var(--ink-soft);
+  }
+  .toggle svg{width:16px;height:16px; stroke:var(--blue-1);}
+
+  /* settings panel */
+  .panel{
+    position:absolute; top:46px; right:0; width:230px;
+    background: var(--surface); backdrop-filter: blur(14px);
+    border:1px solid var(--ring); border-radius:16px; box-shadow: var(--shadow);
+    padding:16px; display:none; flex-direction:column; gap:14px;
+    text-align:left;
+  }
+  .panel.open{ display:flex; }
+  .panel label{ font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:4px; }
+  .panel input[type=range]{ width:100%; accent-color: var(--blue-1); }
+  .panel .acc-link{
+    font-size:13px; font-weight:600; color:var(--blue-1); text-decoration:none;
+    display:block; padding-top:6px; border-top:1px solid var(--ring); margin-top:2px;
+  }
+
+  main{
+    max-width:640px; margin:0 auto; padding:80px 24px 60px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    position:relative; z-index:1;
+  }
+
+  /* entrance animation */
+  .in{ opacity:0; transform:translateY(24px); animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
+
+  .avatar-wrap{ position:relative; width:140px; height:140px; margin-bottom:28px; }
+  .ring{ position:absolute; inset:0; border-radius:50%; border:2px solid var(--blue-2); animation: pulse 3s ease-out infinite; opacity:0; }
+  .ring:nth-child(2){ animation-delay:1s; }
+  .ring:nth-child(3){ animation-delay:2s; }
+  @keyframes pulse{ 0%{ transform:scale(.9); opacity:.6; } 100%{ transform:scale(1.6); opacity:0; } }
+  .avatar-link{ display:block; width:140px; height:140px; border-radius:50%; position:relative; z-index:1; }
+  .avatar{
+    width:140px; height:140px; border-radius:50%;
+    background: linear-gradient(135deg, var(--blue-1), var(--cyan));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Sora',sans-serif; font-weight:800; font-size:48px; color:#fff;
+    box-shadow: var(--shadow);
+  }
+
+  .badge{ display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--ring); padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600; color:var(--blue-1); margin-bottom:16px; letter-spacing:.03em; }
+  .badge .dot{ width:7px; height:7px; border-radius:50%; background:var(--cyan); animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink{ 50%{ opacity:.3; } }
+
+  h1{ font-size:34px; font-weight:800; margin-bottom:8px; }
+  .tagline{ font-size:16px; color:var(--blue-1); font-weight:600; margin-bottom:18px; }
+  .bio-text{ font-size:15px; line-height:1.7; color:var(--ink-soft); max-width:480px; margin-bottom:28px; }
+
+  .stats{ display:flex; gap:32px; margin-bottom:32px; }
+  .stat b{ display:block; font-family:'Sora',sans-serif; font-size:22px; }
+  .stat span{ font-size:12px; color:var(--ink-soft); }
+
+  .links{ display:flex; flex-direction:column; gap:14px; width:100%; max-width:360px; margin-bottom:44px; }
+  .link-btn{
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface); border:1px solid var(--ring);
+    padding:14px 20px; border-radius:16px;
+    text-decoration:none; color:var(--ink); font-weight:600; font-size:15px;
+    box-shadow: var(--shadow); transition: transform .25s ease;
+  }
+  .link-btn:hover{ transform: translateY(-3px) scale(1.015); }
+  .link-btn svg{ width:22px; height:22px; flex-shrink:0; }
+  .link-btn .handle{ margin-left:auto; font-size:12px; color:var(--ink-soft); font-weight:500; }
+
+  /* video sections */
+  .video-section{ width:100%; margin-bottom:24px; text-align:left; }
+  .video-card{
+    border-radius:16px; overflow:hidden; box-shadow: var(--shadow);
+    background:var(--surface); border:1px solid var(--ring);
+  }
+  .video-card .platform-link{
+    display:flex; align-items:center; gap:8px;
+    padding:12px 16px; font-size:15px; font-weight:700; color:var(--ink);
+    text-decoration:none; transition: color .2s ease;
+  }
+  .video-card .platform-link:hover{ color:var(--blue-1); }
+  .video-card .platform-link svg{ width:18px; height:18px; color:var(--blue-1); flex-shrink:0; }
+  .video-card .platform-link .arrow{ margin-left:auto; width:14px; height:14px; color:var(--ink-soft); }
+  .video-card .video-wrap{ position:relative; aspect-ratio:16/9; background:#000; }
+  .video-card video{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .music-bar{
+    width:100%; display:flex; align-items:center; gap:12px;
+    background:var(--surface); border:1px solid var(--ring); border-radius:14px;
+    padding:12px 16px; margin-bottom:44px; box-shadow: var(--shadow);
+  }
+  .music-bar button{
+    width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+    background: linear-gradient(135deg, var(--blue-1), var(--cyan)); color:#fff;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .music-bar button svg{ width:16px; height:16px; }
+  .music-info{ font-size:12px; color:var(--ink-soft); text-align:left; line-height:1.4; }
+  .music-info b{ color:var(--ink); display:block; font-size:13px; }
+
+  footer{ font-size:12px; color:var(--ink-soft); }
+
+  @media (max-width:480px){
+    h1{ font-size:26px; }
+    main{ padding:80px 18px 40px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ring, .bg-wave span, .badge .dot, .marquee-bar a, .in{ animation:none !important; opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="marquee-bar">
+  <!-- Ganti href dan teks di bawah ini -->
+  <a href="https://instagram.com/username" target="_blank" rel="noopener">✨ Halo, makasih udah mampir! Cek video terbaru aku di TikTok & Instagram — klik di sini ✨</a>
+</div>
+
+<div class="bg-wave"><span></span><span></span><span></span></div>
+
+<div class="top-controls">
+  <div class="icon-btn" id="settingsBtn" title="Pengaturan">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+    <div class="panel" id="settingsPanel">
+      <div>
+        <label>Kecerahan</label>
+        <input type="range" id="brightRange" min="70" max="130" value="100">
+      </div>
+      <div>
+        <label>Kontras</label>
+        <input type="range" id="contrastRange" min="70" max="130" value="100">
+      </div>
+      <a class="acc-link" href="#akun">Pengaturan Akun</a>
+    </div>
+  </div>
+  <div class="toggle" id="modeToggle">
+    <svg id="modeIcon" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"></path><circle cx="12" cy="12" r="4"></circle></svg>
+    <span id="modeLabel">Mode Gelap</span>
+  </div>
+</div>
+
+<main>
+  <div class="avatar-wrap in" style="animation-delay:.05s">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <!-- Ganti href foto profil dengan link yang kamu mau -->
+    <a class="avatar-link" href="https://instagram.com/username" target="_blank" rel="noopener">
+      <div class="avatar">NK</div>
+    </a>
+  </div>
+
+  <div class="badge in" style="animation-delay:.15s"><span class="dot"></span> LIVE CREATING</div>
+
+  <h1 class="in" style="animation-delay:.25s">Nama Kamu</h1>
+  <div class="tagline in" style="animation-delay:.32s">Content Creator • Storyteller</div>
+  <p class="bio-text in" style="animation-delay:.4s">
+    Tulis bio singkat kamu di sini — siapa kamu, konten apa yang kamu buat, dan apa yang bikin kamu beda.
+  </p>
+
+  <div class="stats in" style="animation-delay:.48s">
+    <div class="stat"><b>0</b><span>Followers IG</span></div>
+    <div class="stat"><b>0</b><span>Followers TikTok</span></div>
+    <div class="stat"><b>0</b><span>Konten</span></div>
+  </div>
+
+  <div class="links in" style="animation-delay:.56s">
+    <a class="link-btn" href="https://instagram.com/username" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1"></circle></svg>
+      Instagram <span class="handle">@username</span>
+    </a>
+    <a class="link-btn" href="https://tiktok.com/@username" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3c.3 2.4 1.9 4 4.5 4.2V10c-1.6 0-3-.5-4.5-1.5V15a5.5 5.5 0 1 1-5.5-5.5c.3 0 .7 0 1 .1v2.6a2.9 2.9 0 1 0 2 2.8V3h2.5Z"></path></svg>
+      TikTok <span class="handle">@username</span>
+    </a>
+  </div>
+
+  <!-- VIDEO TIKTOK: ganti src video di bawah dengan file videomu -->
+  <div class="video-section in" style="animation-delay:.64s">
+    <div class="video-card">
+      <a class="platform-link" href="https://tiktok.com/@username" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3c.3 2.4 1.9 4 4.5 4.2V10c-1.6 0-3-.5-4.5-1.5V15a5.5 5.5 0 1 1-5.5-5.5c.3 0 .7 0 1 .1v2.6a2.9 2.9 0 1 0 2 2.8V3h2.5Z"></path></svg>
+        TikTok
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg>
+      </a>
+      <div class="video-wrap"><video muted autoplay loop playsinline src="video-tiktok.mp4"></video></div>
+    </div>
+  </div>
+
+  <!-- VIDEO INSTAGRAM: ganti src video di bawah dengan file videomu -->
+  <div class="video-section in" style="animation-delay:.72s">
+    <div class="video-card">
+      <a class="platform-link" href="https://instagram.com/username" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
+        Instagram
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg>
+      </a>
+      <div class="video-wrap"><video muted autoplay loop playsinline src="video-ig.mp4"></video></div>
+    </div>
+  </div>
+
+  <!-- MUSIK: ganti src audio di bawah dengan file musikmu. Browser memblokir autoplay bersuara, jadi musik mulai setelah tombol play ditekan -->
+  <div class="music-bar in" style="animation-delay:.8s">
+    <button id="musicBtn">
+      <svg id="musicIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+    </button>
+    <div class="music-info"><b>Musik Latar</b>Tekan untuk memutar (ganti src audio di kode)</div>
+    <audio id="bgMusic" loop src="musik-latar.mp3"></audio>
+  </div>
+
+  <footer id="akun">© 2026 Nama Kamu — dibuat dengan 💙</footer>
+</main>
+
+<script>
+  const root = document.documentElement;
+  const toggle = document.getElementById('modeToggle');
+  const label = document.getElementById('modeLabel');
+
+  function applyMode(dark){
+    root.classList.toggle('dark', dark);
+    label.textContent = dark ? 'Mode Terang' : 'Mode Gelap';
+  }
+  applyMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  toggle.addEventListener('click', () => applyMode(!root.classList.contains('dark')));
+
+  // settings panel
+  const settingsBtn = document.getElementById('settingsBtn');
+  const panel = document.getElementById('settingsPanel');
+  settingsBtn.addEventListener('click', (e) => {
+    if(e.target.closest('.panel')) return;
+    panel.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if(!settingsBtn.contains(e.target)) panel.classList.remove('open');
+  });
+  document.getElementById('brightRange').addEventListener('input', e => {
+    root.style.setProperty('--u-bright', e.target.value/100);
+  });
+  document.getElementById('contrastRange').addEventListener('input', e => {
+    root.style.setProperty('--u-contrast', e.target.value/100);
+  });
+
+  // music toggle
+  const musicBtn = document.getElementById('musicBtn');
+  const musicIcon = document.getElementById('musicIcon');
+  const bgMusic = document.getElementById('bgMusic');
+  let playing = false;
+  musicBtn.addEventListener('click', () => {
+    if(!playing){
+      bgMusic.play().catch(()=>{});
+      musicIcon.innerHTML = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"></path>';
+    } else {
+      bgMusic.pause();
+      musicIcon.innerHTML = '<path d="M8 5v14l11-7z"></path>';
+    }
+    playing = !playing;
+  });
+</script>
+
+</body>
+</html>
